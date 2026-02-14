@@ -19,7 +19,7 @@
 
 ## 📌 About the Project
 
-This is an end-to-end automation framework built for testing **[Automation Exercise]** using **Playwright**.
+This is an end-to-end automation framework built for testing **Automation Exercise Website** using **Playwright**.
 
 The framework follows industry best practices including:
 - **Page Object Model (POM)** for maintainability
@@ -183,6 +183,3 @@ npx playwright show-report
 
 ---
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
