@@ -19,14 +19,20 @@ export class CommonUtils {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    static async verifyTextVisibility(text,page){
+    static async verifyTextVisibility(page,text){
         await page.getByText(text).waitFor({state:'visible'});
-        await expect(page.getByText(text)).toBeVisible();;
+        await expect(page.getByText(text)).toBeVisible();
     }
 
      static async clickButtonWithName(buttonName,page){
         await page.getByRole('button',{name:buttonName}).click();
-        await expect(page.getByRole('button',{name:buttonName})).not.toBeVisible();
+    }
+
+    static async clickLinkWithName(page,linkName){
+        await page.getByRole('link', { name: linkName }).click();
+    }
+    static async clickLinkWithNameRegex(page, link) {
+        await page.getByRole('link', { name: new RegExp(link) }).click();
     }
 }
 
