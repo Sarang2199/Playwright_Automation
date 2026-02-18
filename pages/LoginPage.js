@@ -25,18 +25,19 @@ constructor(page) {
         this.continueBtn = page.getByRole('link', { name: 'Continue' });
         this.loginPassword = page.getByRole('textbox', { name: 'Password' });
         this.loginEmail = page.locator('form').filter({ hasText: 'Login' }).getByPlaceholder('Email Address');
+        this.logoutBtn = page.getByRole('link', { name: /Logout/ });
     }
 
-    async registerNewUser(){
-        await this.passwordInput.fill('Test123');
-        await this.firstNameInput.fill('John');
-        await this.lastNameInput.fill('Don');
-        await this.companyInput.fill('Apple Beed Ltd');
-        await this.addressInput.fill('Mukkan Post Beed');
-        await this.stateInput.fill('Maharashtra');
-        await this.cityInput.fill('Beed');
-        await this.zipcodeInput.fill('443323');
-        await this.phoneInput.fill('8877665599');
+    async registerNewUser(user){
+        await this.passwordInput.fill(user.password);
+        await this.firstNameInput.fill(user.firstName);
+        await this.lastNameInput.fill(user.lastName);
+        await this.companyInput.fill(user.company);
+        await this.addressInput.fill(user.address);
+        await this.stateInput.fill(user.state);
+        await this.cityInput.fill(user.city);
+        await this.zipcodeInput.fill(user.zipcode);
+        await this.phoneInput.fill(user.phone);
 
         await CommonUtils.clickButtonWithName('Create Account',this.page);
         await CommonUtils.verifyTextVisibility(this.page,ConstantText.ACCOUNT_CREATED)
@@ -67,6 +68,10 @@ constructor(page) {
         await this.loginEmail.fill(userEmail);
         await this.loginPassword.fill(password);
         
+    }
+    async clickLogout(){
+        //Click on Logout button
+        await this.logoutBtn.click();
     }
 
     async deleteAccount(){

@@ -1,0 +1,25 @@
+{
+  "validUser": {
+    "email": "admindummy@gmail.com",
+    "password": "admindummy"
+  },
+  "invalidUser": {
+    "email": "admindummy@gmail.com",
+    "password": "wrongpassword"
+  },
+  "newUser": {
+    "password": "Test123",
+    "firstName": "John",
+    "lastName": "Don",
+    "company": "Apple Beed Ltd",
+    "address": "Mukkan Post Beed",
+    "state": "Maharashtra",
+    "city": "Beed",
+    "zipcode": "443323",
+    "phone": "8877665599"
+  },
+  "searchProducts": [
+    { "name": "Mens Tshirt" },
+    { "name": "Women Dress" }
+  ]
+}
