@@ -1,21 +1,30 @@
 pipeline {
     agent any
+
     tools {
         nodejs 'node'
-        // This MUST match the name you gave in Step 2
-        allure 'Allure_1.0' 
+        allure 'Allure_1.0' // Ensure this matches your Tool name
     }
+
     stages {
+        stage('Install Dependencies') {
+            steps {
+                // This downloads @playwright/test and other packages
+                sh 'npm install'
+                // This installs the actual browser binaries (Chromium, etc.)
+                sh 'npx playwright install --with-deps'
+            }
+        }
+
         stage('Run Tests') {
             steps {
-                // The '|| true' allows the pipeline to continue to reporting even if tests fail
                 sh 'npx playwright test || true'
             }
         }
     }
+
     post {
         always {
-            // This command looks for the 'allure-results' folder and generates the report
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
         }
     }
