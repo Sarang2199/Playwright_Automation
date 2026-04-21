@@ -3,25 +3,31 @@ pipeline {
         docker {
             image 'mcr.microsoft.com/playwright:v1.58.1-jammy'
             args '--user root --ipc=host'
-            // This is the magic line that fixes your error
+            // CRITICAL FIX: This keeps the workspace context alive for the post block
             reuseNode true 
         }
     }
-    
+
     stages {
-        stage('Run') {
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
                 sh 'npx playwright test --workers=4 || true'
             }
         }
     }
-    
+
     post {
         always {
+            // These steps now have access to hudson.FilePath
             archiveArtifacts artifacts: 'test-results/**/*.zip', allowEmptyArchive: true
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
-            cleanWs()
+            cleanWs() 
         }
     }
 }
