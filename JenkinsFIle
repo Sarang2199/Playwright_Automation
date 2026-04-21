@@ -11,14 +11,12 @@ pipeline {
             steps {
                 // This downloads @playwright/test and other packages
                 sh 'npm install'
-                // This installs the actual browser binaries (Chromium, etc.)
-                sh 'npx playwright test --workers=4 || true'            }
-        }
+                // This installs the actual browser binaries (Chromium, etc.)   
+                sh 'npx playwright install --with-deps'        }
 
         stage('Run Tests') {
             steps {
-                sh 'npx playwright test || true'
-            }
+                sh 'npx playwright test --workers=4 || true'            }
         }
     }
 
