@@ -2,33 +2,40 @@ pipeline {
     agent any
 
     tools {
+        // Ensure 'node' and 'Allure_1.0' are configured in Jenkins Global Tool Configuration
         nodejs 'node'
-        allure 'Allure_1.0' // Ensure this matches your Tool name
+        allure 'Allure_1.0' 
     }
 
     stages {
         stage('Install Dependencies') {
             steps {
-                // This downloads @playwright/test and other packages
+                // Installs packages from package.json
                 sh 'npm install'
-                // This installs the actual browser binaries (Chromium, etc.)   
-                sh 'npx playwright install --with-deps'        }
+                // Installs browsers and system dependencies
+                sh 'npx playwright install --with-deps'
+            }
+        }
 
         stage('Run Tests') {
             steps {
-                sh 'npx playwright test --workers=4 || true'            }
+                // Using --workers=4 to run tests in parallel for speed
+                // '|| true' ensures the pipeline continues to the Post stage even if tests fail
+                sh 'npx playwright test --workers=4 || true'
+            }
         }
     }
 
     post {
         always {
-            // 1. Archive first so you don't lose the data
+            // 1. Archive Traces and Videos (important for debugging Playwright)
             archiveArtifacts artifacts: 'test-results/**/*.zip', allowEmptyArchive: true
             
-            // 2. Generate report
+            // 2. Generate the Allure Report
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
             
-            // 3. Clean the workspace
+            // 3. Wipe workspace to save disk space on your Mac
+            // Note: Requires "Workspace Cleanup" plugin
             cleanWs() 
         }
     }
