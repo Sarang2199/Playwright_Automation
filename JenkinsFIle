@@ -1,25 +1,26 @@
 pipeline {
     agent {
         docker {
-            // This image comes with Node.js and all browser dependencies pre-installed
+            // Ensure this version matches your package.json exactly
             image 'mcr.microsoft.com/playwright:v1.58.1-jammy'
-            // Necessary to run browsers inside Docker without 'sandbox' issues
-            args '--user root'
+            // Added --ipc=host to prevent browser crashes
+            args '--user root --ipc=host'
         }
     }
+
+    // Removed 'tools' block because Docker image already provides Node.js
 
     stages {
         stage('Install Dependencies') {
             steps {
-                // Since we are in Docker, we only need npm install.
-                // We don't need 'npx playwright install --with-deps' 
-                // because the image already has them!
+                // Installs your framework's dependencies
                 sh 'npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
+                // parallel workers set to 4
                 sh 'npx playwright test --workers=4 || true'
             }
         }
@@ -27,8 +28,13 @@ pipeline {
 
     post {
         always {
+            // Archives traces/videos for debugging
             archiveArtifacts artifacts: 'test-results/**/*.zip', allowEmptyArchive: true
+            
+            // Generates Allure report
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+            
+            // Keeps the Jenkins workspace clean
             cleanWs()
         }
     }
