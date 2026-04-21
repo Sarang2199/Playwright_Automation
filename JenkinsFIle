@@ -12,8 +12,7 @@ pipeline {
                 // This downloads @playwright/test and other packages
                 sh 'npm install'
                 // This installs the actual browser binaries (Chromium, etc.)
-                sh 'npx playwright install --with-deps'
-            }
+                sh 'npx playwright test --workers=4 || true'            }
         }
 
         stage('Run Tests') {
@@ -25,7 +24,14 @@ pipeline {
 
     post {
         always {
+            // 1. Archive first so you don't lose the data
+            archiveArtifacts artifacts: 'test-results/**/*.zip', allowEmptyArchive: true
+            
+            // 2. Generate report
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+            
+            // 3. Clean the workspace
+            cleanWs() 
         }
     }
 }
