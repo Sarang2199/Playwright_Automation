@@ -1,40 +1,26 @@
 pipeline {
     agent {
         docker {
-            // Ensure this version matches your package.json exactly
             image 'mcr.microsoft.com/playwright:v1.58.1-jammy'
-            // Added --ipc=host to prevent browser crashes
             args '--user root --ipc=host'
+            // This is the magic line that fixes your error
+            reuseNode true 
         }
     }
-
-    // Removed 'tools' block because Docker image already provides Node.js
-
+    
     stages {
-        stage('Install Dependencies') {
+        stage('Run') {
             steps {
-                // Installs your framework's dependencies
                 sh 'npm install'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                // parallel workers set to 4
                 sh 'npx playwright test --workers=4 || true'
             }
         }
     }
-
+    
     post {
         always {
-            // Archives traces/videos for debugging
             archiveArtifacts artifacts: 'test-results/**/*.zip', allowEmptyArchive: true
-            
-            // Generates Allure report
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
-            
-            // Keeps the Jenkins workspace clean
             cleanWs()
         }
     }
