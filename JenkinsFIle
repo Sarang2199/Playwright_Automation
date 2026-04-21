@@ -1,26 +1,25 @@
 pipeline {
-    agent any
-
-    tools {
-        // Ensure 'node' and 'Allure_1.0' are configured in Jenkins Global Tool Configuration
-        nodejs 'node'
-        allure 'Allure_1.0' 
+    agent {
+        docker {
+            // This image comes with Node.js and all browser dependencies pre-installed
+            image 'mcr.microsoft.com/playwright:v1.58.1-jammy'
+            // Necessary to run browsers inside Docker without 'sandbox' issues
+            args '--user root'
+        }
     }
 
     stages {
         stage('Install Dependencies') {
             steps {
-                // Installs packages from package.json
+                // Since we are in Docker, we only need npm install.
+                // We don't need 'npx playwright install --with-deps' 
+                // because the image already has them!
                 sh 'npm install'
-                // Installs browsers and system dependencies
-                sh 'npx playwright install --with-deps'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Using --workers=4 to run tests in parallel for speed
-                // '|| true' ensures the pipeline continues to the Post stage even if tests fail
                 sh 'npx playwright test --workers=4 || true'
             }
         }
@@ -28,15 +27,9 @@ pipeline {
 
     post {
         always {
-            // 1. Archive Traces and Videos (important for debugging Playwright)
             archiveArtifacts artifacts: 'test-results/**/*.zip', allowEmptyArchive: true
-            
-            // 2. Generate the Allure Report
             allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
-            
-            // 3. Wipe workspace to save disk space on your Mac
-            // Note: Requires "Workspace Cleanup" plugin
-            cleanWs() 
+            cleanWs()
         }
     }
 }
